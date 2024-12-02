@@ -15,10 +15,10 @@ date_ranges = [
 ]
 
 # Convert date ranges to datetime objects
-date_ranges = [
-    (datetime.strptime(start, "%Y-%m-%d"), datetime.strptime(end, "%Y-%m-%d"))
-    for start, end in date_ranges
-]
+# date_ranges = [
+#     (datetime.strptime(start, "%Y-%m-%d"), datetime.strptime(end, "%Y-%m-%d"))
+#     for start, end in date_ranges
+# ]
 
 
 def get_save_name(county: str):
@@ -129,6 +129,17 @@ for start_date, end_date in date_ranges:
         f"arcgis_data/{start_date.replace('-', '')}_to_{end_date.replace('-', '')}.csv"
     )
     data = pd.read_csv(file_name, dtype={"fips": str})
+    data["end_date"] = end_date
+    midpoint = (
+        datetime.strptime(start_date, "%Y-%m-%d")
+        + (
+            datetime.strptime(end_date, "%Y-%m-%d")
+            - datetime.strptime(start_date, "%Y-%m-%d")
+        )
+        / 2
+    )
+    # print(midpoint.date())
+    data["mid_date"] = midpoint.date()
     merged_data = pd.concat([merged_data, data], ignore_index=True)
 
 # Save the merged data to a new CSV
